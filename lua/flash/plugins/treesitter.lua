@@ -35,12 +35,11 @@ function M.get_nodes(win, pos, end_pos)
   for _, range in ipairs(ranges) do
     ---@type Flash.Match
     local match = {
-      pos = { range[1] + 1, range[2] },
-      end_pos = { range[3] + 1, range[4] - 1 },
+      pos = Pos({ range[1] + 1, range[2] }),
+      end_pos = Pos({ range[3] + 1, range[4] - 1 }),
       highlight_range = end_pos and { pos = pos, end_pos = end_pos },
       first = first,
     }
-    first = false
     -- If the match is at the end of the buffer,
     -- then move it to the last character of the last line.
     if match.end_pos[1] > line_count then
@@ -57,7 +56,11 @@ function M.get_nodes(win, pos, end_pos)
       match.end_pos[2] = #line
     end
     local id = table.concat({ unpack(match.pos), unpack(match.end_pos) }, ".")
+    if end_pos and match.end_pos < end_pos then
+      done[id] = true
+    end
     if not done[id] then
+      first = false
       done[id] = true
       ret[#ret + 1] = match
     end
